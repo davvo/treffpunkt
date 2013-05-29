@@ -4,15 +4,14 @@
  */
 
 var express = require('express')
-  , routes = require('./routes')
-  , user = require('./routes/user')
+  , mongodb = require('mongodb')
   , http = require('http')
   , path = require('path');
 
 var app = express();
 
 // all environments
-app.set('port', process.env.PORT || 3000);
+app.set('port', process.env.VCAP_APP_PORT || 8080);
 app.set('views', __dirname + '/views');
 app.set('view engine', 'jade');
 app.use(express.favicon());
@@ -27,9 +26,17 @@ if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
 
-app.get('/', routes.index);
-app.get('/users', user.list);
-
-http.createServer(app).listen(app.get('port'), function(){
-  console.log('Express server listening on port ' + app.get('port'));
+mongodb.MongoClient.connect(process.env.MONGO_URL, function(err, db) {
+	if (!err) {
+		console.log("Connected to mongodb");
+		require('./routes/index')(app, db);
+		require('./routes/events')(app, db);
+		http.createServer(app).listen(app.get('port'), function () {
+		  console.log('Server listening on port ' + app.get('port'));
+		});
+	} else {
+		console.error(err);
+	}
 });
+
+

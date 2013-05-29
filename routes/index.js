@@ -1,8 +1,7 @@
+module.exports = function (app, db) {
 
-/*
- * GET home page.
- */
+	app.get('/', function(req, res) {
+  		res.render('index', { title: 'Treffpunk' });
+	});
 
-exports.index = function(req, res){
-  res.render('index', { title: 'Treffpunk' });
 };

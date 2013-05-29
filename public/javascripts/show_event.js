@@ -48,7 +48,7 @@
 	    }).addTo(map);
 
 	    marker = L.marker([$event.lat, $event.lng]).addTo(map);
-	    
+
 	    buildPopup();
 	}
 

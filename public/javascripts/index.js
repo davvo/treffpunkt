@@ -8,7 +8,7 @@
 
 	function initMap() {
 		map = L.map('map', {
-			closePopupOnClick: false			
+			closePopupOnClick: false
 		}).setView([59.31566, 18.05955], 10);
 
 	    L.tileLayer('http://{s}.eniro.no/geowebcache/service/tms1.0.0/map2x/{z}/{x}/{y}.png', {

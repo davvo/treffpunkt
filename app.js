@@ -29,7 +29,6 @@ if ('development' == app.get('env')) {
 mongodb.MongoClient.connect(process.env.MONGO_URL, function(err, db) {
 	if (!err) {
 		console.log("Connected to mongodb");
-		require('./routes/index')(app, db);
 		require('./routes/events')(app, db);
 		http.createServer(app).listen(app.get('port'), function () {
 		  console.log('Server listening on port ' + app.get('port'));

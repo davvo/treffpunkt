@@ -103,6 +103,7 @@
 
 		html.push('<div class="footer">');
 		html.push('<button id="joinButton">Jag kommer!</button>');
+		html.push('<p>Inloggning via Facebook</p>');
 		html.push('</div>');
 
 		var popup = L.popup({

@@ -42,6 +42,12 @@ ul.attendees li img {
 	margin-right: 7px;
 }
 
+#map .leaflet-popup-content .footer p {
+	font-style: italic;
+	margin: 5px 0 0 0;
+	text-align: center;
+}
+
 h1 {
 	font-size: 16px;
 	font-weight: normal;
@@ -65,6 +71,12 @@ input[type=submit] {
 input[type=text] {
 	margin: 0;
 	width: 170px;
+}
+
+button {
+	margin: 0;
+	display: block;
+	margin: 0 auto;
 }
 
 #map .leaflet-popup.say .leaflet-popup-content {

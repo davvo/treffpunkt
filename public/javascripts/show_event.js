@@ -54,7 +54,7 @@
 				.appendTo(footer);
 			$('<span>')
 				.attr('id', 'fbName')
-				.html(fbName ? fbName : '')
+				.html(fbName || '')
 				.appendTo(footer);
 
 			var textField = $('<input>')

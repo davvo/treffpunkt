@@ -28,7 +28,15 @@
 #map .leaflet-popup-content {
 	margin: 0;
 	padding: 0;
-/*	width: 285px;*/
+	max-width: 285px;
+}
+
+@media screen and (max-width: 500px) {
+
+	#map .leaflet-popup-content {
+		max-width: 200px;
+	}
+
 }
 
 #map .leaflet-popup-content-wrapper {

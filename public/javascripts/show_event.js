@@ -99,7 +99,7 @@
 			offset: L.point(0, -63)
 		})
 			.setLatLng(marker.getLatLng())
-		    .setContent(html.join(''));
+			.setContent(html.join(''));
 
 		map.on('popupopen', function (evt) {
 			if (evt.popup === popup) {
@@ -132,9 +132,9 @@
 				} else {
 					markers[user] = L.marker(pos, {
 						icon: L.icon({
-						    iconUrl: 'http://floating-brook-3028.herokuapp.com/' + user,
-						    iconSize: [62, 71],
-						    iconAnchor: [31, 65]
+							iconUrl: 'http://floating-brook-3028.herokuapp.com/' + user,
+							iconSize: [62, 71],
+							iconAnchor: [31, 65]
 						})
 					}).addTo(map);
 				}
@@ -159,22 +159,22 @@
 			closePopupOnClick: false
 		}).setView([$event.lat, $event.lng], $event.zoom);
 
-	    L.tileLayer('http://{s}.eniro.no/geowebcache/service/tms1.0.0/map2x/{z}/{x}/{y}.png', {
-	        subdomains: ['map01', 'map02', 'map03', 'map04'],
-	        attribution: 'Maps from <a href="http://www.eniro.se">Eniro</a>',
-	        tms: true,
-	        maxZoom: 17
-	    }).addTo(map);
+		L.tileLayer('http://{s}.eniro.no/geowebcache/service/tms1.0.0/map2x/{z}/{x}/{y}.png', {
+			subdomains: ['map01', 'map02', 'map03', 'map04'],
+			attribution: 'Maps from <a href="http://www.eniro.se">Eniro</a>',
+			tms: true,
+			maxZoom: 17
+		}).addTo(map);
 
-	    marker = L.marker([$event.lat, $event.lng], {
-	    	icon: L.icon({
+		marker = L.marker([$event.lat, $event.lng], {
+			icon: L.icon({
 				iconUrl: '/images/marker.png',
 				iconSize: [62, 71],
-				iconAnchor: [31, 65]	    		
-	    	})
-	    }).addTo(map);
+				iconAnchor: [31, 65]
+			})
+		}).addTo(map);
 
-	    buildPopup();
+		buildPopup();
 	}
 
 	function initFacebook() {

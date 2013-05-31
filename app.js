@@ -6,7 +6,8 @@
 var express = require('express')
   , mongodb = require('mongodb')
   , http = require('http')
-  , path = require('path');
+  , path = require('path')
+  , io = require('socket.io');
 
 var app = express();
 
@@ -29,10 +30,22 @@ if ('development' == app.get('env')) {
 mongodb.MongoClient.connect(process.env.MONGO_URL, function(err, db) {
 	if (!err) {
 		console.log("Connected to mongodb");
-		require('./routes/events')(app, db);
-		http.createServer(app).listen(app.get('port'), function () {
+
+		var events = require('./routes/events');
+		events.bindRoutes(app, db);
+
+		// express webserver
+		var server = http.createServer(app);		
+		server.listen(app.get('port'), function () {
 		  console.log('Server listening on port ' + app.get('port'));
 		});
+		
+		// websocket
+		var ws = io.listen(server);
+		ws.sockets.on('connection', function (socket) { 
+			events.bindWebSocket(ws.sockets, socket, db);
+		});
+
 	} else {
 		console.error(err);
 	}

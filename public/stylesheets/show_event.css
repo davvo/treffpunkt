@@ -1,12 +1,12 @@
-body, html {
-	height: 100%;
-	margin: 0;
-	padding: 0;
+div.event {
+	padding: 15px 25px 25px 25px;
 }
 
-#map {
-	width: 100%;
-	height: 100%;
+.eventLink {
+	display: block;
+	width: 240px;
+	text-overflow: ellipsis;
+	overflow: hidden;
 }
 
 ul.attendees {
@@ -17,18 +17,97 @@ ul.attendees {
 
 ul.attendees li {
 	display: inline;
-	margin-right: 2px;
+	margin-right: 7px;
 }
 
 ul.attendees li img {
-	width: 24px;
+	width: 30px;
+	height: 30px;
 }
 
 .footer {
-	margin-left: -20px;
-	margin-right: -20px;
-	margin-top: 20px;
+	background: #f9f9f9;
 	border-top: solid 1px #eee;
-	padding-top: 15px;
-	text-align: center;
+	padding: 15px 25px;
+}
+
+#map .leaflet-popup-tip {
+	background: #f9f9f9 !important;
+}
+
+.footer img {
+	width: 30px;
+	height: 30px;
+	vertical-align: middle;
+	margin-right: 7px;
+}
+
+h1 {
+	font-size: 16px;
+	font-weight: normal;
+	margin: 15px 0 25px 0;
+}
+
+h2 {
+	font-size: 1em;
+	font-weight: normal;
+	margin: 15px 0 0 0;
+}
+
+form {
+	margin: 7px 0 0 0;
+}
+
+input[type=submit] {
+	margin: 0 0 0 5px;
+}
+
+input[type=text] {
+	margin: 0;
+	width: 170px;
+}
+
+#map .leaflet-popup.say .leaflet-popup-content {
+	padding: 1px !important;
+	min-width: 100px;
+	max-width: 200px;
+}
+
+#map .leaflet-popup.say .leaflet-popup-tip {
+	background: white !important;
+}
+
+#map .leaflet-popup.say .leaflet-popup-content p.say {
+	font-style: italic;
+	margin: 15px 20px;
+}
+
+@media screen and (max-width: 500px) {
+
+	div.event {
+		padding: 5px 15px 15px 15px;
+	}
+
+	.eventLink {
+		width: 170px;
+		text-overflow: ellipsis;
+		overflow: hidden;
+	}
+
+	.footer {
+		padding: 10px 15px;
+	}
+
+	h1 {
+		margin: 10px 0 15px 0;
+	}
+
+	form {
+		margin: 5px 0 0 0;
+	}
+
+	input[type=text] {
+		width: 105px;
+	}
+
 }

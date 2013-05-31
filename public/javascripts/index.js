@@ -7,13 +7,19 @@
 	var map, marker;
 
 	function initMap() {
+
 		map = L.map('map', {
-			closePopupOnClick: false
+			closePopupOnClick: false,
+			zoomControl: false
 		}).setView([59.31566, 18.05955], 10);
+
+		map.addControl(new L.Control.Zoom({
+			position: "bottomleft"
+		}));
 
 	    L.tileLayer('http://{s}.eniro.no/geowebcache/service/tms1.0.0/map2x/{z}/{x}/{y}.png', {
 	        subdomains: ['map01', 'map02', 'map03', 'map04'],
-	        attribution: 'Maps from <a href="http://www.eniro.se">Eniro</a>',
+	        attribution: 'Maps by <a href="http://www.eniro.se">Eniro</a>',
 	        tms: true,
 	        maxZoom: 17
 	    }).addTo(map);
@@ -34,23 +40,28 @@
 	}
 
 	function addMarker() {
+
 		marker = L.marker(map.getCenter(), {
+			icon: L.icon({
+				iconUrl: '/images/marker.png',
+				iconSize: [62, 71],
+				iconAnchor: [31, 65]
+			}),
 			draggable: true
 		}).addTo(map);
 
 		var html = [];
-		html.push('<strong>Dra markören eller klicka i kartan för att välja plats.</strong>');
-		html.push('<br/>');
-		html.push('<textarea cols="34" rows="10" placeholder="Vad händer här?"></textarea>');
-		html.push('<br/>');
-		html.push('<button id="submit">Spara</button>');
+		html.push('<img id="logo" src="images/treffpunkt.png" width="145" height="29" title="" alt="treffpunkt">');
+		html.push('<textarea cols="30" rows="5" placeholder="Berätta varför dina vänner ska komma"></textarea>');
+		html.push('<button id="submit">Spara treffpunkt</button>');
 
 		map.on('popupopen', function (evt) {
 			$('#submit').click(saveEvent);
 		});
 
 		var popup = L.popup({
-			offset: L.point(0, -35)
+			offset: L.point(0, -63),
+			closeButton: false
 		})
 			.setLatLng(marker.getLatLng())
 		    .setContent(html.join(''))

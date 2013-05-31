@@ -12,6 +12,7 @@
 
 		fbLoginStatus,
 		fbUserId,
+		fbName,
 
 		socket,
 		watchId;
@@ -51,6 +52,10 @@
 			$('<img>')
 				.attr('src', 'http://graph.facebook.com/' + fbUserId + '/picture')
 				.appendTo(footer);
+			$('<span>')
+				.attr('id', 'fbName')
+				.html(fbName ? fbName : '')
+				.appendTo(footer);
 
 			var textField = $('<input>')
 				.attr('type', 'text')
@@ -79,18 +84,23 @@
 	function buildPopup() {
 		var html = [];
 
+		// Wrapper
+		html.push('<div class="event">');
+
 		// Event description
-		html.push('<p class="description">');
+		html.push('<h1>');
 		html.push($event.text);
-		html.push('</p>');
+		html.push('</h1>');
 
 		// The link
-		html.push('<h3>Skicka vidare</h3>');
+		html.push('<h2>Skicka vidare</h2>');
 		html.push('<a class="eventLink" href="' + $event._id + '">' + location.href + '</a>');
 
-		html.push('<h3>Vi kommer</h3>');
+		html.push('<h2>Vi kommer</h2>');
 		html.push('<ul class="attendees">');
 		html.push('</ul>');
+		html.push('</div>');
+
 		html.push('<div class="footer">');
 		html.push('<button id="joinButton">Jag kommer!</button>');
 		html.push('</div>');
@@ -156,12 +166,18 @@
 
 	function initMap() {
 		map = L.map('map', {
-			closePopupOnClick: false
+			closePopupOnClick: false,
+			zoomControl: false
 		}).setView([$event.lat, $event.lng], $event.zoom);
+
+		map.addControl(new L.Control.Zoom({
+			position: "bottomleft"
+		}));
+
 
 		L.tileLayer('http://{s}.eniro.no/geowebcache/service/tms1.0.0/map2x/{z}/{x}/{y}.png', {
 			subdomains: ['map01', 'map02', 'map03', 'map04'],
-			attribution: 'Maps from <a href="http://www.eniro.se">Eniro</a>',
+			attribution: 'Maps by <a href="http://www.eniro.se">Eniro</a>',
 			tms: true,
 			maxZoom: 17
 		}).addTo(map);
@@ -187,6 +203,12 @@
 			fbLoginStatus = response.status;
 			if (response.authResponse) {
 				fbUserId = response.authResponse.userID;
+
+				FB.api("/me", function (response) {
+					fbName = response.name;
+					$('#fbName').html(fbName);
+				});
+
 				if ($event.attendees[fbUserId]) {
 					joinEvent();
 				}
@@ -205,8 +227,10 @@
 			});
 		}
 		popup.setLatLng(markers[user].getLatLng());
-		popup.setContent(words);
+		popup.setContent('<p class="say">' + words + '</p>');
 		map.addLayer(popup);
+
+		popup._container.className = popup._container.className + " say";
 	}
 
 	function initSocket() {

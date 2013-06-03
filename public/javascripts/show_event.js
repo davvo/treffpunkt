@@ -173,6 +173,7 @@
 			popup.openOn(map);
 		});
 
+		/*
 		map.on('click', function (evt) {
 			if (fbUserId) {
 				console.log(evt);
@@ -184,6 +185,7 @@
 				});
 			}
 		});
+		*/
 
 		updatePopup();
 	}

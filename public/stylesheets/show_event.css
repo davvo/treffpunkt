@@ -79,6 +79,11 @@ button {
 	margin: 0 auto;
 }
 
+button.logged-in {
+	float: right;
+	display: inline;
+}
+
 #map .leaflet-popup.say .leaflet-popup-content {
 	padding: 1px !important;
 	min-width: 100px;

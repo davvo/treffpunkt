@@ -85,10 +85,14 @@
 		if (fbUserId) {
 			html.push('<img src="http://graph.facebook.com/' + fbUserId + '/picture">');
 			html.push('<span id="fbName">' + (fbName || '') + '</span>');
-			html.push('<form id="sayForm">');
-			html.push('<input type="text" placeholder="Säg något"/>');
-			html.push('<input type="submit" value="Säg"/>');
-			html.push('</form>');
+			if ($event.attendees[fbUserId]) {
+				html.push('<form id="sayForm">');
+				html.push('<input type="text" placeholder="Säg något"/>');
+				html.push('<input type="submit" value="Säg"/>');
+				html.push('</form>');
+			} else {
+				html.push('<button class="logged-in" id="joinButton">Jag kommer</button>');
+			}
 		} else {
 			html.push('<button id="joinButton">Jag kommer</button>');
 			html.push('<p>Inloggning via Facebook</p>');

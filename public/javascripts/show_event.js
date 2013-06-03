@@ -6,11 +6,11 @@
 
 	var map,
 		marker,
+		popup,
 
 		markers = [],
 		popups = [],
 
-		fbLoginStatus,
 		fbUserId,
 		fbName,
 
@@ -20,18 +20,20 @@
 	function watchPosition() {
 		if (navigator.geolocation) {
 			watchId = navigator.geolocation.watchPosition(function (response) {
-				socket.emit('position', {
-					event: $event._id,
-					user: fbUserId,
-					lat: response.coords.latitude,
-					lng: response.coords.longitude
-				});
+				if (response.coords && fbUserId) {
+					socket.emit('position', {
+						event: $event._id,
+						user: fbUserId,
+						lat: response.coords.latitude,
+						lng: response.coords.longitude
+					});
+				}
 			});
 		}
 	}
 
 	function joinEvent() {
-		if (fbLoginStatus !== 'connected') {
+		if (!fbUserId) {
 			FB.login(function (response) {
 				if (response.authResponse) {
 					joinEvent();
@@ -47,41 +49,10 @@
 			if (!watchId) {
 				watchPosition();
 			}
-			// Update popup footer
-			var footer = $('.footer').empty();
-			$('<img>')
-				.attr('src', 'http://graph.facebook.com/' + fbUserId + '/picture')
-				.appendTo(footer);
-			$('<span>')
-				.attr('id', 'fbName')
-				.html(fbName || '')
-				.appendTo(footer);
-
-			var textField = $('<input>')
-				.attr('type', 'text')
-				.attr('placeholder', 'Säg något');
-
-			var button = $('<input>')
-				.attr('type', 'submit')
-				.val('Säg');
-
-			var form = $('<form>')
-				.append(textField)
-				.append(button)
-				.appendTo(footer)
-				.submit(function (evt) {
-					evt.preventDefault();
-					socket.emit('say', {
-						'event': $event._id,
-						'user': fbUserId,
-						'words': textField.val()
-					});
-				});
-
 		}
 	}
 
-	function buildPopup() {
+	function updatePopup() {
 		var html = [];
 
 		// Wrapper
@@ -96,46 +67,40 @@
 		html.push('<h2>Skicka vidare</h2>');
 		html.push('<a class="eventLink" href="' + $event._id + '">' + location.href + '</a>');
 
-		html.push('<h2>Vi kommer</h2>');
-		html.push('<ul class="attendees">');
+		if (Object.keys($event.attendees).length > 0) {
+			html.push('<h2>Vi kommer</h2>');
+			html.push('<ul class="attendees">');
+			$.each($event.attendees, function (user, data) {
+				html.push('<li>');
+				html.push('<img src="http://graph.facebook.com/' + user + '/picture"/>');
+				html.push('</li>');
+			});
+		}
+
 		html.push('</ul>');
 		html.push('</div>');
 
 		html.push('<div class="footer">');
-		html.push('<button id="joinButton">Jag kommer</button>');
-		html.push('<p>Inloggning via Facebook</p>');
-		html.push('</div>');
 
-		var popup = L.popup({
-			offset: L.point(0, -63)
-		})
-			.setLatLng(marker.getLatLng())
-			.setContent(html.join(''));
+		if (fbUserId) {
+			html.push('<img src="http://graph.facebook.com/' + fbUserId + '/picture">');
+			html.push('<span id="fbName">' + (fbName || '') + '</span>');
+			html.push('<form id="sayForm">');
+			html.push('<input type="text" placeholder="Säg något"/>');
+			html.push('<input type="submit" value="Säg"/>');
+			html.push('</form>');
+		} else {
+			html.push('<button id="joinButton">Jag kommer</button>');
+			html.push('<p>Inloggning via Facebook</p>');
+			html.push('</div>');
+		}
 
-		map.on('popupopen', function (evt) {
-			if (evt.popup === popup) {
-				$('#joinButton').click(joinEvent);
-			}
-		});
-
-		marker.on('click', function (evt) {
-			popup.openOn(map);
-		});
-
+		popup.setContent(html.join(''));
 		popup.openOn(map);
 	}
 
 	function updateAttendees() {
-		var items = [];
 		$.each($event.attendees, function (user, data) {
-			var li = $('<li>');
-			items.push(li);
-
-			$('<img>')
-				.attr('src', 'http://graph.facebook.com/' + user + '/picture')
-				.appendTo(li);
-
-
 			if (data.pos) {
 				var pos = [data.pos.lat, data.pos.lng];
 				if (markers[user]) {
@@ -154,15 +119,6 @@
 				}
 			}
 		});
-		$('ul.attendees').empty().append(items);
-	}
-
-	function positionSuccess(position) {
-		var latlng = new L.LatLng(position.coords.latitude, position.coords.longitude);
-	}
-
-	function positionError(err) {
-		console.warn(err);
 	}
 
 	function initMap() {
@@ -191,7 +147,41 @@
 			})
 		}).addTo(map);
 
-		buildPopup();
+		popup = L.popup({
+			offset: L.point(0, -63)
+		}).setLatLng(marker.getLatLng());
+
+		map.on('popupopen', function (evt) {
+			if (evt.popup === popup) {
+				$('#joinButton').click(joinEvent);
+				$('#sayForm').submit(function (evt) {
+					evt.preventDefault();
+					socket.emit('say', {
+						'event': $event._id,
+						'user': fbUserId,
+						'words': $('#sayForm input[type=text]').val()
+					});
+				});
+			}
+		});
+
+		marker.on('click', function (evt) {
+			popup.openOn(map);
+		});
+
+		map.on('click', function (evt) {
+			if (fbUserId) {
+				console.log(evt);
+				socket.emit('position', {
+					event: $event._id,
+					user: fbUserId,
+					lat: evt.latlng.lat,
+					lng: evt.latlng.lng
+				});
+			}
+		});
+
+		updatePopup();
 	}
 
 	function initFacebook() {
@@ -201,13 +191,13 @@
 			xfbml: true
 		});
 		FB.Event.subscribe('auth.statusChange', function (response) {
-			fbLoginStatus = response.status;
 			if (response.authResponse) {
 				fbUserId = response.authResponse.userID;
 
 				FB.api("/me", function (response) {
 					fbName = response.name;
 					$('#fbName').html(fbName);
+					updatePopup();
 				});
 
 				if ($event.attendees[fbUserId]) {
@@ -228,10 +218,11 @@
 			});
 		}
 		popup.setLatLng(markers[user].getLatLng());
-		popup.setContent('<p class="say">' + words + '</p>');
 		map.addLayer(popup);
 
 		popup._container.className = popup._container.className + " say";
+		popup.setContent('<p class="say">' + words + '</p>');
+
 	}
 
 	function initSocket() {
@@ -239,8 +230,12 @@
 
 		socket.on('update', function (data) {
 			if (data.event === $event._id) {
+				var newAttendee = !$event.attendees[data.user.id];
 				$event.attendees[data.user.id] = data.user;
 				updateAttendees();
+				if (newAttendee) {
+					updatePopup();
+				}
 			}
 		});
 
